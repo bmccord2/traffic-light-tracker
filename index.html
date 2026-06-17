@@ -22,40 +22,37 @@
   h1{font-family:var(--mono);font-weight:600;font-size:19px;letter-spacing:.04em;margin:2px 0 0}
   .sub{color:var(--muted);font-size:12.5px;margin-top:5px;line-height:1.5}
 
-  /* ---- phase ring ---- */
   .scope{position:relative;width:100%;aspect-ratio:1;max-width:330px;margin:20px auto 6px;display:block}
   .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}
   .cstate{font-family:var(--mono);font-size:11px;letter-spacing:.28em;color:var(--muted);text-transform:uppercase}
   .cbig{font-family:var(--mono);font-weight:600;font-size:46px;line-height:1;margin-top:6px;font-variant-numeric:tabular-nums;letter-spacing:.01em}
   .cnote{font-family:var(--mono);font-size:12px;margin-top:8px;letter-spacing:.04em}
 
-  /* ---- verdict ---- */
-  .verdict{display:flex;align-items:center;gap:9px;justify-content:center;font-family:var(--mono);font-size:12.5px;letter-spacing:.05em;padding:9px;border:1px solid var(--line);border-radius:11px;background:var(--panel);margin:8px 0 16px}
+  .verdict{display:flex;align-items:center;gap:9px;justify-content:center;font-family:var(--mono);font-size:12.5px;letter-spacing:.05em;padding:9px;border:1px solid var(--line);border-radius:11px;background:var(--panel);margin:8px 0 16px;text-align:center}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:0 0 auto}
 
-  /* ---- buttons ---- */
   .btn{width:100%;border:none;border-radius:14px;font-family:var(--mono);font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:19px;font-size:15px;cursor:pointer;transition:transform .05s,filter .15s}
   .btn:active{transform:scale(.985)}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .btn-green{background:var(--green);color:#06231a}
+  .btn-red{background:var(--red);color:#2a0708}
   .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
   .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line);font-size:12px;letter-spacing:.1em;padding:14px}
 
-  /* ---- readout grid ---- */
   .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:18px}
   .cell{background:var(--panel);padding:12px 11px}
-  .cell .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
-  .cell .v{font-family:var(--mono);font-size:19px;margin-top:5px;font-variant-numeric:tabular-nums}
+  .cell .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+  .cell .v{font-family:var(--mono);font-size:18px;margin-top:5px;font-variant-numeric:tabular-nums}
 
-  /* ---- settings ---- */
   details{margin-top:16px;border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden}
   summary{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding:13px 14px;cursor:pointer;list-style:none}
   summary::-webkit-details-marker{display:none}
   summary::after{content:"+";float:right;color:var(--amber)}
-  details[open] summary::after{content:"–"}
+  details[open] summary::after{content:"\2013"}
   .setbody{padding:4px 14px 14px;border-top:1px solid var(--line)}
   .field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
   .field:last-child{border-bottom:none}
-  .field label{font-size:12.5px;color:var(--ink);max-width:62%}
+  .field label{font-size:12.5px;color:var(--ink);max-width:60%}
   .field .h{display:block;color:var(--muted);font-size:11px;margin-top:2px;line-height:1.4}
   .field input{width:78px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-family:var(--mono);font-size:14px;padding:8px;border-radius:8px;text-align:right}
   .foot{color:var(--muted);font-size:11px;line-height:1.6;margin:18px 2px 4px;font-family:var(--mono)}
@@ -66,12 +63,12 @@
 <body>
   <div class="eyebrow">Phase Scope</div>
   <h1>Signal cycle predictor</h1>
-  <p class="sub">Tap <b style="color:var(--green)">Log green</b> the instant the light turns green — that's a phase anchor. After a few, it learns the cycle and tells you how long until the next green, so you can decide: wait, or U-turn.</p>
+  <p class="sub">Whenever you see the light, tap its current colour. No need to wait for it to change. From enough snapshots it works out the cycle length, how long green lasts, and when the next green is due — nothing about timing is assumed.</p>
 
   <svg class="scope" viewBox="0 0 240 240" id="ring" aria-hidden="true">
     <circle cx="120" cy="120" r="104" fill="none" stroke="#212B32" stroke-width="16"/>
-    <path id="redArc"   fill="none" stroke="var(--red)"   stroke-width="16" stroke-linecap="butt"/>
-    <path id="greenArc" fill="none" stroke="var(--green)" stroke-width="16" stroke-linecap="butt"/>
+    <path id="redArc"   fill="none" stroke="var(--red)"   stroke-width="16"/>
+    <path id="greenArc" fill="none" stroke="var(--green)" stroke-width="16"/>
     <line id="hand" x1="120" y1="120" x2="120" y2="24" stroke="var(--amber)" stroke-width="2.5" stroke-linecap="round" style="display:none"/>
     <circle cx="120" cy="120" r="4.5" fill="var(--amber)"/>
   </svg>
@@ -79,192 +76,198 @@
   <div class="center">
     <div class="cstate" id="cstate">No data</div>
     <div class="cbig"   id="cbig">—</div>
-    <div class="cnote"  id="cnote" style="color:var(--muted)">Tap a green to begin</div>
+    <div class="cnote"  id="cnote" style="color:var(--muted)">Tap the colour you see</div>
   </div>
 
   <div class="verdict"><span class="dot" id="vdot"></span><span id="vtext">Not enough data yet</span></div>
 
-  <button class="btn btn-green" id="btnGreen">● Log green</button>
+  <div class="pair">
+    <button class="btn btn-green" id="btnGreen">● Green now</button>
+    <button class="btn btn-red"   id="btnRed">● Red now</button>
+  </div>
   <div class="btn-row">
-    <button class="btn btn-ghost" id="btnArrive">Log arrival</button>
     <button class="btn btn-ghost" id="btnUndo">Undo last</button>
+    <button class="btn btn-ghost" id="btnExport">Export CSV</button>
   </div>
 
   <div class="grid">
     <div class="cell"><div class="k">Cycle</div><div class="v" id="mCycle">—</div></div>
-    <div class="cell"><div class="k">Greens</div><div class="v" id="mN">0</div></div>
-    <div class="cell"><div class="k">Jitter ±</div><div class="v" id="mJit">—</div></div>
+    <div class="cell"><div class="k">Green lasts</div><div class="v" id="mGreen">—</div></div>
+    <div class="cell"><div class="k">Caught G / R</div><div class="v" id="mN">0 / 0</div></div>
   </div>
 
   <details>
     <summary>Settings &amp; data</summary>
     <div class="setbody">
       <div class="field">
-        <label>Green length<span class="h">How long green stays lit, in seconds.</span></label>
-        <input id="sGreen" type="number" min="3" max="120" step="1" value="20">
-      </div>
-      <div class="field">
-        <label>U-turn cost<span class="h">If green is further than this many seconds away, the U-turn wins.</span></label>
+        <label>U-turn cost<span class="h">If the next green is further than this many seconds away, the U-turn wins.</span></label>
         <input id="sThresh" type="number" min="5" max="600" step="5" value="60">
       </div>
       <div class="field">
-        <label>Export a backup<span class="h">Phone storage can be wiped. Save a CSV now and then.</span></label>
-        <button class="btn btn-ghost" style="width:auto;padding:10px 14px" id="btnExport">Export</button>
+        <label>Search up to<span class="h">Longest cycle length to consider, in seconds. Raise it if the real cycle might be longer.</span></label>
+        <input id="sMax" type="number" min="60" max="1800" step="30" value="900">
       </div>
       <div class="field">
-        <label>Import a backup<span class="h">Restore events from a CSV you exported.</span></label>
+        <label>Import a backup<span class="h">Restore snapshots from a CSV you exported.</span></label>
         <button class="btn btn-ghost" style="width:auto;padding:10px 14px" id="btnImport">Import</button>
         <input id="fileImport" type="file" accept=".csv,text/csv">
       </div>
       <div class="field">
-        <label class="danger">Clear everything<span class="h">Deletes all logged events. Can't be undone.</span></label>
+        <label class="danger">Clear everything<span class="h">Deletes all snapshots. Can't be undone.</span></label>
         <button class="btn btn-ghost danger" style="width:auto;padding:10px 14px;border-color:#5a2a2c" id="btnClear">Clear</button>
       </div>
     </div>
   </details>
 
-  <p class="foot" id="foot">Tip: long reds often run different cycle lengths by time of day. If jitter stays high, it may be actuated (green only when a car trips the loop) — then no fixed schedule exists, and that's the answer.</p>
+  <p class="foot">Green is a small slice of the cycle, so random taps land on red far more often — expect to log a lot before the green arc settles. Tapping at varied times of day is what makes it solvable; always tapping at the same moment tells it nothing. If green and red never separate cleanly, the light is probably actuated (green only when a car trips the loop) and has no fixed schedule.</p>
 
 <script>
 (function(){
   "use strict";
-  const KEY="phasescope.v1";
+  const KEY="phasescope.v2";
   const $=id=>document.getElementById(id);
-  const R=104, C2PI=2*Math.PI*R;
+  const R=104;
 
-  let state = load();
+  let state=load();
   function load(){
     try{ const s=JSON.parse(localStorage.getItem(KEY)); if(s&&s.events) return s; }catch(e){}
-    return {events:[], green:20, thresh:60};
+    // migrate v1 if present
+    try{
+      const old=JSON.parse(localStorage.getItem("phasescope.v1"));
+      if(old&&old.events){ const ev=old.events.filter(e=>e.type==="green").map(e=>({t:e.t,s:"green"}));
+        return {events:ev,thresh:60,cmax:900}; }
+    }catch(e){}
+    return {events:[],thresh:60,cmax:900};
   }
-  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(state)); }catch(e){} }
+  $("sThresh").value=state.thresh; $("sMax").value=state.cmax;
 
-  // restore settings
-  $("sGreen").value=state.green; $("sThresh").value=state.thresh;
-
-  function greens(){ return state.events.filter(e=>e.type==="green").map(e=>e.t).sort((a,b)=>a-b); }
-
-  // ---- cycle estimation: d_i = k_i*C + noise, k_i positive integer ----
-  function estimate(){
-    const g=greens();
-    if(g.length<2) return {C:null,n:g.length,resid:null,anchor:g[g.length-1]??null,nd:0};
-    const d=[]; for(let i=1;i<g.length;i++){ const x=(g[i]-g[i-1])/1000; if(x>5) d.push(x); }
-    if(!d.length) return {C:null,n:g.length,resid:null,anchor:g[g.length-1],nd:0};
-    let C=Math.min(...d);                       // seed: shortest real gap = base cycle guess
-    for(let it=0;it<25;it++){
-      let num=0,den=0;
-      for(const x of d){ const k=Math.max(1,Math.round(x/C)); num+=k*x; den+=k*k; }
-      const next=num/den; if(Math.abs(next-C)<1e-4) break; C=next;
+  // ---------- inference ----------
+  // Observations (t seconds, state). Fold by trial period C: green snapshots should
+  // collapse into one arc, reds fill the rest. Pick C minimising reds-inside-green-arc.
+  function scoreC(C, gT, rT){
+    const gp=gT.map(t=>((t%C)+C)%C/C).sort((a,b)=>a-b);
+    // largest circular gap among greens -> green arc is the complement
+    let maxGap=-1, gapAfter=0;
+    for(let i=0;i<gp.length;i++){
+      const a=gp[i], b=(i+1<gp.length)?gp[i+1]:gp[0]+1;
+      const g=b-a; if(g>maxGap){maxGap=g; gapAfter=i;}
     }
-    let ss=0; for(const x of d){ const k=Math.max(1,Math.round(x/C)); ss+=(x-k*C)**2; }
-    const resid=Math.sqrt(ss/d.length);
-    return {C,n:g.length,resid,anchor:g[g.length-1],nd:d.length};
+    const arcStart=gp[(gapAfter+1)%gp.length];
+    const arcEnd=gp[gapAfter];                 // going clockwise arcStart..arcEnd contains all greens
+    const width=1-maxGap;                      // green fraction of cycle
+    // count reds whose phase lands inside [arcStart,arcEnd] (circular)
+    let err=0;
+    for(const t of rT){
+      const p=((t%C)+C)%C/C;
+      const d=((p-arcStart)%1+1)%1;
+      if(d<=((arcEnd-arcStart)%1+1)%1) err++;
+    }
+    return {C,err,width,arcStart};
+  }
+  function estimate(){
+    const ev=state.events;
+    const gT=ev.filter(e=>e.s==="green").map(e=>e.t/1000);
+    const rT=ev.filter(e=>e.s==="red").map(e=>e.t/1000);
+    const out={ng:gT.length,nr:rT.length,C:null};
+    if(gT.length<2||ev.length<4) return out;
+    const CMAX=Math.max(60,state.cmax||900);
+    let best=null;
+    for(let C=20;C<=CMAX;C+=0.5){
+      const s=scoreC(C,gT,rT);
+      if(s.width>=0.95) continue;              // smeared: reject
+      if(!best||s.err<best.err||(s.err===best.err&&s.width<best.width)) best=s;
+    }
+    if(!best) return out;
+    // refine
+    let ref=best;
+    for(let C=Math.max(20,best.C-1);C<=best.C+1;C+=0.02){
+      const s=scoreC(C,gT,rT);
+      if(s.width>=0.95) continue;
+      if(s.err<ref.err||(s.err===ref.err&&s.width<ref.width)) ref=s;
+    }
+    out.C=ref.C; out.width=ref.width; out.arcStart=ref.arcStart; out.err=ref.err;
+    return out;
   }
 
-  function mmss(s){ s=Math.max(0,Math.round(s)); const m=Math.floor(s/60); const r=s%60; return m+":"+String(r).padStart(2,"0"); }
-
-  function polar(cx,cy,r,a){ const rad=(a-90)*Math.PI/180; return [cx+r*Math.cos(rad), cy+r*Math.sin(rad)]; }
-  function arc(a0,a1){
-    if(a1-a0>=359.999) a1=a0+359.999;
-    const [x0,y0]=polar(120,120,R,a0), [x1,y1]=polar(120,120,R,a1);
-    const large=(a1-a0)>180?1:0;
-    return `M ${x0} ${y0} A ${R} ${R} 0 ${large} 1 ${x1} ${y1}`;
-  }
+  function mmss(s){ s=Math.max(0,Math.round(s)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+  function polar(r,a){ const rad=(a-90)*Math.PI/180; return [120+r*Math.cos(rad),120+r*Math.sin(rad)]; }
+  function arc(a0,a1){ if(a1-a0>=359.999)a1=a0+359.999; const[x0,y0]=polar(R,a0),[x1,y1]=polar(R,a1); const lg=(a1-a0)>180?1:0; return `M ${x0} ${y0} A ${R} ${R} 0 ${lg} 1 ${x1} ${y1}`; }
 
   function render(){
-    const est=estimate();
-    $("mN").textContent=est.n;
-    const now=Date.now();
+    const e=estimate();
+    $("mN").textContent=e.ng+" / "+e.nr;
+    const now=Date.now()/1000;
 
-    if(est.C){
-      const greenSec=Math.min(state.green, est.C*0.9);
-      const gFrac=greenSec/est.C;
-      // green window starts at anchor; phase 0 = green onset at top (12 o'clock)
-      $("greenArc").setAttribute("d", arc(0, gFrac*360));
-      $("redArc").setAttribute("d", arc(gFrac*360, 360));
-      // where are we now in the cycle, measured from the anchor green
-      const elapsed=(now-est.anchor)/1000;
-      let phase=((elapsed % est.C)+est.C)%est.C;          // 0..C, seconds since last (modeled) green
+    if(e.C){
+      const gs=e.arcStart, gw=e.width;          // green arc: [gs, gs+gw) in turns
+      $("greenArc").setAttribute("d",arc(gs*360,(gs+gw)*360));
+      $("redArc").setAttribute("d",arc((gs+gw)*360,(gs+1)*360));
+      const phase=((now%e.C)+e.C)%e.C/e.C;
       $("hand").style.display="";
-      $("hand").setAttribute("transform",`rotate(${phase/est.C*360} 120 120)`);
+      $("hand").setAttribute("transform",`rotate(${phase*360} 120 120)`);
+      $("mCycle").textContent=mmss(e.C);
+      $("mGreen").textContent=Math.round(gw*e.C)+"s";
 
-      $("mCycle").textContent=mmss(est.C);
-      $("mJit").textContent=est.resid!=null?("±"+Math.round(est.resid)+"s"):"—";
-
-      const inGreen = phase < greenSec;
-      const toNext = est.C - phase;                        // seconds to next modeled green
+      const into=((phase-gs)%1+1)%1;            // turns into green arc
+      const inGreen=into<gw;
       if(inGreen){
         $("cstate").textContent="Now"; $("cstate").style.color="var(--green)";
         $("cbig").textContent="GREEN"; $("cbig").style.color="var(--green)";
-        $("cnote").textContent="~"+Math.ceil(greenSec-phase)+"s left"; $("cnote").style.color="var(--muted)";
+        $("cnote").textContent="~"+Math.ceil((gw-into)*e.C)+"s left"; $("cnote").style.color="var(--muted)";
       }else{
+        const toGreen=(((gs-phase)%1+1)%1)*e.C;
         $("cstate").textContent="Green in"; $("cstate").style.color="var(--muted)";
-        $("cbig").textContent=mmss(toNext); $("cbig").style.color="var(--ink)";
-        const wait = toNext <= state.thresh;
-        $("cnote").textContent = wait ? "WAIT — beats the U-turn" : "U-TURN — faster than waiting";
-        $("cnote").style.color = wait ? "var(--green)" : "var(--amber)";
+        $("cbig").textContent=mmss(toGreen); $("cbig").style.color="var(--ink)";
+        const wait=toGreen<=state.thresh;
+        $("cnote").textContent=wait?"WAIT — beats the U-turn":"U-TURN — faster than waiting";
+        $("cnote").style.color=wait?"var(--green)":"var(--amber)";
       }
 
-      // verdict from jitter relative to cycle
-      const rel = est.resid/est.C;
-      let txt,col;
-      if(est.nd<3){ txt="Learning — log a few more greens"; col="var(--amber)"; }
-      else if(rel<0.04){ txt="Looks fixed-time — predictable"; col="var(--green)"; }
-      else if(rel<0.10){ txt="Roughly periodic — usable, some drift"; col="var(--amber)"; }
-      else{ txt="High jitter — likely actuated or time-of-day"; col="var(--red)"; }
+      let txt,col; const n=e.ng+e.nr;
+      if(e.ng<4){ txt="Need more greens — only "+e.ng+" caught"; col="var(--amber)"; }
+      else if(n<14){ txt="Learning — keep logging at varied times"; col="var(--amber)"; }
+      else if(e.err===0){ txt="Clean separation — looks predictable"; col="var(--green)"; }
+      else if(e.err<=Math.max(1,e.nr*0.08)){ txt="Mostly clean — minor overlap"; col="var(--amber)"; }
+      else{ txt="Green & red overlap — likely actuated"; col="var(--red)"; }
       $("vtext").textContent=txt; $("vdot").style.background=col;
     }else{
-      $("greenArc").setAttribute("d",""); $("redArc").setAttribute("d","");
-      $("hand").style.display="none";
-      $("mCycle").textContent="—"; $("mJit").textContent="—";
+      $("greenArc").setAttribute("d",""); $("redArc").setAttribute("d",""); $("hand").style.display="none";
+      $("mCycle").textContent="—"; $("mGreen").textContent="—";
       $("cstate").textContent="No data"; $("cstate").style.color="var(--muted)";
       $("cbig").textContent="—"; $("cbig").style.color="var(--ink)";
-      $("cnote").textContent= est.n===1 ? "1 green logged — need one more" : "Tap a green to begin";
-      $("cnote").style.color="var(--muted)";
-      $("vtext").textContent= est.n? "Need at least two greens":"Not enough data yet";
-      $("vdot").style.background="var(--muted)";
+      $("cnote").textContent=e.ng<2?"Catch at least 2 greens":"Keep logging"; $("cnote").style.color="var(--muted)";
+      $("vtext").textContent="Not enough data yet"; $("vdot").style.background="var(--muted)";
     }
   }
 
-  // ---- actions ----
-  function add(type){ state.events.push({t:Date.now(),type}); save(); render(); }
+  function add(s){ state.events.push({t:Date.now(),s}); save(); render(); }
   $("btnGreen").onclick=()=>add("green");
-  $("btnArrive").onclick=()=>add("arrive");
+  $("btnRed").onclick=()=>add("red");
   $("btnUndo").onclick=()=>{ if(state.events.length){ state.events.pop(); save(); render(); } };
-
-  $("sGreen").onchange=e=>{ state.green=Math.max(3,+e.target.value||20); save(); render(); };
-  $("sThresh").onchange=e=>{ state.thresh=Math.max(5,+e.target.value||60); save(); render(); };
+  $("sThresh").onchange=ev=>{ state.thresh=Math.max(5,+ev.target.value||60); save(); render(); };
+  $("sMax").onchange=ev=>{ state.cmax=Math.max(60,+ev.target.value||900); save(); render(); };
 
   $("btnExport").onclick=()=>{
-    const rows=[["iso","epoch_ms","type"]].concat(
-      state.events.map(e=>[new Date(e.t).toISOString(),e.t,e.type]));
-    const csv=rows.map(r=>r.join(",")).join("\n");
+    const rows=[["iso","epoch_ms","state"]].concat(state.events.map(e=>[new Date(e.t).toISOString(),e.t,e.s]));
     const a=document.createElement("a");
-    a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-    a.download="phase-scope-"+new Date().toISOString().slice(0,10)+".csv";
-    a.click();
+    a.href=URL.createObjectURL(new Blob([rows.map(r=>r.join(",")).join("\n")],{type:"text/csv"}));
+    a.download="phase-scope-"+new Date().toISOString().slice(0,10)+".csv"; a.click();
   };
   $("btnImport").onclick=()=>$("fileImport").click();
-  $("fileImport").onchange=e=>{
-    const f=e.target.files[0]; if(!f) return;
-    const rd=new FileReader();
-    rd.onload=()=>{
-      try{
-        const lines=rd.result.split(/\r?\n/).filter(Boolean);
-        const out=[];
-        for(let i=1;i<lines.length;i++){
-          const p=lines[i].split(","); const t=+p[1], type=(p[2]||"").trim();
-          if(t&&(type==="green"||type==="arrive")) out.push({t,type});
-        }
-        if(out.length){ state.events=out.sort((a,b)=>a.t-b.t); save(); render(); }
-      }catch(err){ alert("Couldn't read that CSV."); }
-    };
-    rd.readAsText(f); e.target.value="";
+  $("fileImport").onchange=ev=>{
+    const f=ev.target.files[0]; if(!f)return; const rd=new FileReader();
+    rd.onload=()=>{ try{
+      const lines=rd.result.split(/\r?\n/).filter(Boolean); const out=[];
+      for(let i=1;i<lines.length;i++){ const p=lines[i].split(","); const t=+p[1], s=(p[2]||"").trim();
+        if(t&&(s==="green"||s==="red")) out.push({t,s}); }
+      if(out.length){ state.events=out.sort((a,b)=>a.t-b.t); save(); render(); }
+    }catch(err){ alert("Couldn't read that CSV."); } };
+    rd.readAsText(f); ev.target.value="";
   };
-  $("btnClear").onclick=()=>{ if(confirm("Delete all logged events?")){ state.events=[]; save(); render(); } };
+  $("btnClear").onclick=()=>{ if(confirm("Delete all snapshots?")){ state.events=[]; save(); render(); } };
 
-  render();
-  setInterval(render,1000);     // live countdown + sweeping hand
+  render(); setInterval(render,1000);
 })();
 </script>
 </body>
