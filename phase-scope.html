@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#11161A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Phase Scope</title>
+<style>
+  :root{
+    --bg:#11161A; --panel:#1A2228; --panel2:#212B32;
+    --ink:#C7D0D4; --muted:#6B7980; --line:#2C3942;
+    --green:#35D07F; --red:#E5484D; --amber:#F0A92B;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans)}
+  body{padding:max(18px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom));max-width:520px;margin:0 auto;min-height:100vh}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.32em;color:var(--amber);text-transform:uppercase}
+  h1{font-family:var(--mono);font-weight:600;font-size:19px;letter-spacing:.04em;margin:2px 0 0}
+  .sub{color:var(--muted);font-size:12.5px;margin-top:5px;line-height:1.5}
+
+  /* ---- phase ring ---- */
+  .scope{position:relative;width:100%;aspect-ratio:1;max-width:330px;margin:20px auto 6px;display:block}
+  .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}
+  .cstate{font-family:var(--mono);font-size:11px;letter-spacing:.28em;color:var(--muted);text-transform:uppercase}
+  .cbig{font-family:var(--mono);font-weight:600;font-size:46px;line-height:1;margin-top:6px;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+  .cnote{font-family:var(--mono);font-size:12px;margin-top:8px;letter-spacing:.04em}
+
+  /* ---- verdict ---- */
+  .verdict{display:flex;align-items:center;gap:9px;justify-content:center;font-family:var(--mono);font-size:12.5px;letter-spacing:.05em;padding:9px;border:1px solid var(--line);border-radius:11px;background:var(--panel);margin:8px 0 16px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:0 0 auto}
+
+  /* ---- buttons ---- */
+  .btn{width:100%;border:none;border-radius:14px;font-family:var(--mono);font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:19px;font-size:15px;cursor:pointer;transition:transform .05s,filter .15s}
+  .btn:active{transform:scale(.985)}
+  .btn-green{background:var(--green);color:#06231a}
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line);font-size:12px;letter-spacing:.1em;padding:14px}
+
+  /* ---- readout grid ---- */
+  .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:18px}
+  .cell{background:var(--panel);padding:12px 11px}
+  .cell .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+  .cell .v{font-family:var(--mono);font-size:19px;margin-top:5px;font-variant-numeric:tabular-nums}
+
+  /* ---- settings ---- */
+  details{margin-top:16px;border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden}
+  summary{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding:13px 14px;cursor:pointer;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";float:right;color:var(--amber)}
+  details[open] summary::after{content:"–"}
+  .setbody{padding:4px 14px 14px;border-top:1px solid var(--line)}
+  .field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .field:last-child{border-bottom:none}
+  .field label{font-size:12.5px;color:var(--ink);max-width:62%}
+  .field .h{display:block;color:var(--muted);font-size:11px;margin-top:2px;line-height:1.4}
+  .field input{width:78px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-family:var(--mono);font-size:14px;padding:8px;border-radius:8px;text-align:right}
+  .foot{color:var(--muted);font-size:11px;line-height:1.6;margin:18px 2px 4px;font-family:var(--mono)}
+  .danger{color:var(--red)}
+  input[type=file]{display:none}
+</style>
+</head>
+<body>
+  <div class="eyebrow">Phase Scope</div>
+  <h1>Signal cycle predictor</h1>
+  <p class="sub">Tap <b style="color:var(--green)">Log green</b> the instant the light turns green — that's a phase anchor. After a few, it learns the cycle and tells you how long until the next green, so you can decide: wait, or U-turn.</p>
+
+  <svg class="scope" viewBox="0 0 240 240" id="ring" aria-hidden="true">
+    <circle cx="120" cy="120" r="104" fill="none" stroke="#212B32" stroke-width="16"/>
+    <path id="redArc"   fill="none" stroke="var(--red)"   stroke-width="16" stroke-linecap="butt"/>
+    <path id="greenArc" fill="none" stroke="var(--green)" stroke-width="16" stroke-linecap="butt"/>
+    <line id="hand" x1="120" y1="120" x2="120" y2="24" stroke="var(--amber)" stroke-width="2.5" stroke-linecap="round" style="display:none"/>
+    <circle cx="120" cy="120" r="4.5" fill="var(--amber)"/>
+  </svg>
+
+  <div class="center">
+    <div class="cstate" id="cstate">No data</div>
+    <div class="cbig"   id="cbig">—</div>
+    <div class="cnote"  id="cnote" style="color:var(--muted)">Tap a green to begin</div>
+  </div>
+
+  <div class="verdict"><span class="dot" id="vdot"></span><span id="vtext">Not enough data yet</span></div>
+
+  <button class="btn btn-green" id="btnGreen">● Log green</button>
+  <div class="btn-row">
+    <button class="btn btn-ghost" id="btnArrive">Log arrival</button>
+    <button class="btn btn-ghost" id="btnUndo">Undo last</button>
+  </div>
+
+  <div class="grid">
+    <div class="cell"><div class="k">Cycle</div><div class="v" id="mCycle">—</div></div>
+    <div class="cell"><div class="k">Greens</div><div class="v" id="mN">0</div></div>
+    <div class="cell"><div class="k">Jitter ±</div><div class="v" id="mJit">—</div></div>
+  </div>
+
+  <details>
+    <summary>Settings &amp; data</summary>
+    <div class="setbody">
+      <div class="field">
+        <label>Green length<span class="h">How long green stays lit, in seconds.</span></label>
+        <input id="sGreen" type="number" min="3" max="120" step="1" value="20">
+      </div>
+      <div class="field">
+        <label>U-turn cost<span class="h">If green is further than this many seconds away, the U-turn wins.</span></label>
+        <input id="sThresh" type="number" min="5" max="600" step="5" value="60">
+      </div>
+      <div class="field">
+        <label>Export a backup<span class="h">Phone storage can be wiped. Save a CSV now and then.</span></label>
+        <button class="btn btn-ghost" style="width:auto;padding:10px 14px" id="btnExport">Export</button>
+      </div>
+      <div class="field">
+        <label>Import a backup<span class="h">Restore events from a CSV you exported.</span></label>
+        <button class="btn btn-ghost" style="width:auto;padding:10px 14px" id="btnImport">Import</button>
+        <input id="fileImport" type="file" accept=".csv,text/csv">
+      </div>
+      <div class="field">
+        <label class="danger">Clear everything<span class="h">Deletes all logged events. Can't be undone.</span></label>
+        <button class="btn btn-ghost danger" style="width:auto;padding:10px 14px;border-color:#5a2a2c" id="btnClear">Clear</button>
+      </div>
+    </div>
+  </details>
+
+  <p class="foot" id="foot">Tip: long reds often run different cycle lengths by time of day. If jitter stays high, it may be actuated (green only when a car trips the loop) — then no fixed schedule exists, and that's the answer.</p>
+
+<script>
+(function(){
+  "use strict";
+  const KEY="phasescope.v1";
+  const $=id=>document.getElementById(id);
+  const R=104, C2PI=2*Math.PI*R;
+
+  let state = load();
+  function load(){
+    try{ const s=JSON.parse(localStorage.getItem(KEY)); if(s&&s.events) return s; }catch(e){}
+    return {events:[], green:20, thresh:60};
+  }
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+
+  // restore settings
+  $("sGreen").value=state.green; $("sThresh").value=state.thresh;
+
+  function greens(){ return state.events.filter(e=>e.type==="green").map(e=>e.t).sort((a,b)=>a-b); }
+
+  // ---- cycle estimation: d_i = k_i*C + noise, k_i positive integer ----
+  function estimate(){
+    const g=greens();
+    if(g.length<2) return {C:null,n:g.length,resid:null,anchor:g[g.length-1]??null,nd:0};
+    const d=[]; for(let i=1;i<g.length;i++){ const x=(g[i]-g[i-1])/1000; if(x>5) d.push(x); }
+    if(!d.length) return {C:null,n:g.length,resid:null,anchor:g[g.length-1],nd:0};
+    let C=Math.min(...d);                       // seed: shortest real gap = base cycle guess
+    for(let it=0;it<25;it++){
+      let num=0,den=0;
+      for(const x of d){ const k=Math.max(1,Math.round(x/C)); num+=k*x; den+=k*k; }
+      const next=num/den; if(Math.abs(next-C)<1e-4) break; C=next;
+    }
+    let ss=0; for(const x of d){ const k=Math.max(1,Math.round(x/C)); ss+=(x-k*C)**2; }
+    const resid=Math.sqrt(ss/d.length);
+    return {C,n:g.length,resid,anchor:g[g.length-1],nd:d.length};
+  }
+
+  function mmss(s){ s=Math.max(0,Math.round(s)); const m=Math.floor(s/60); const r=s%60; return m+":"+String(r).padStart(2,"0"); }
+
+  function polar(cx,cy,r,a){ const rad=(a-90)*Math.PI/180; return [cx+r*Math.cos(rad), cy+r*Math.sin(rad)]; }
+  function arc(a0,a1){
+    if(a1-a0>=359.999) a1=a0+359.999;
+    const [x0,y0]=polar(120,120,R,a0), [x1,y1]=polar(120,120,R,a1);
+    const large=(a1-a0)>180?1:0;
+    return `M ${x0} ${y0} A ${R} ${R} 0 ${large} 1 ${x1} ${y1}`;
+  }
+
+  function render(){
+    const est=estimate();
+    $("mN").textContent=est.n;
+    const now=Date.now();
+
+    if(est.C){
+      const greenSec=Math.min(state.green, est.C*0.9);
+      const gFrac=greenSec/est.C;
+      // green window starts at anchor; phase 0 = green onset at top (12 o'clock)
+      $("greenArc").setAttribute("d", arc(0, gFrac*360));
+      $("redArc").setAttribute("d", arc(gFrac*360, 360));
+      // where are we now in the cycle, measured from the anchor green
+      const elapsed=(now-est.anchor)/1000;
+      let phase=((elapsed % est.C)+est.C)%est.C;          // 0..C, seconds since last (modeled) green
+      $("hand").style.display="";
+      $("hand").setAttribute("transform",`rotate(${phase/est.C*360} 120 120)`);
+
+      $("mCycle").textContent=mmss(est.C);
+      $("mJit").textContent=est.resid!=null?("±"+Math.round(est.resid)+"s"):"—";
+
+      const inGreen = phase < greenSec;
+      const toNext = est.C - phase;                        // seconds to next modeled green
+      if(inGreen){
+        $("cstate").textContent="Now"; $("cstate").style.color="var(--green)";
+        $("cbig").textContent="GREEN"; $("cbig").style.color="var(--green)";
+        $("cnote").textContent="~"+Math.ceil(greenSec-phase)+"s left"; $("cnote").style.color="var(--muted)";
+      }else{
+        $("cstate").textContent="Green in"; $("cstate").style.color="var(--muted)";
+        $("cbig").textContent=mmss(toNext); $("cbig").style.color="var(--ink)";
+        const wait = toNext <= state.thresh;
+        $("cnote").textContent = wait ? "WAIT — beats the U-turn" : "U-TURN — faster than waiting";
+        $("cnote").style.color = wait ? "var(--green)" : "var(--amber)";
+      }
+
+      // verdict from jitter relative to cycle
+      const rel = est.resid/est.C;
+      let txt,col;
+      if(est.nd<3){ txt="Learning — log a few more greens"; col="var(--amber)"; }
+      else if(rel<0.04){ txt="Looks fixed-time — predictable"; col="var(--green)"; }
+      else if(rel<0.10){ txt="Roughly periodic — usable, some drift"; col="var(--amber)"; }
+      else{ txt="High jitter — likely actuated or time-of-day"; col="var(--red)"; }
+      $("vtext").textContent=txt; $("vdot").style.background=col;
+    }else{
+      $("greenArc").setAttribute("d",""); $("redArc").setAttribute("d","");
+      $("hand").style.display="none";
+      $("mCycle").textContent="—"; $("mJit").textContent="—";
+      $("cstate").textContent="No data"; $("cstate").style.color="var(--muted)";
+      $("cbig").textContent="—"; $("cbig").style.color="var(--ink)";
+      $("cnote").textContent= est.n===1 ? "1 green logged — need one more" : "Tap a green to begin";
+      $("cnote").style.color="var(--muted)";
+      $("vtext").textContent= est.n? "Need at least two greens":"Not enough data yet";
+      $("vdot").style.background="var(--muted)";
+    }
+  }
+
+  // ---- actions ----
+  function add(type){ state.events.push({t:Date.now(),type}); save(); render(); }
+  $("btnGreen").onclick=()=>add("green");
+  $("btnArrive").onclick=()=>add("arrive");
+  $("btnUndo").onclick=()=>{ if(state.events.length){ state.events.pop(); save(); render(); } };
+
+  $("sGreen").onchange=e=>{ state.green=Math.max(3,+e.target.value||20); save(); render(); };
+  $("sThresh").onchange=e=>{ state.thresh=Math.max(5,+e.target.value||60); save(); render(); };
+
+  $("btnExport").onclick=()=>{
+    const rows=[["iso","epoch_ms","type"]].concat(
+      state.events.map(e=>[new Date(e.t).toISOString(),e.t,e.type]));
+    const csv=rows.map(r=>r.join(",")).join("\n");
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+    a.download="phase-scope-"+new Date().toISOString().slice(0,10)+".csv";
+    a.click();
+  };
+  $("btnImport").onclick=()=>$("fileImport").click();
+  $("fileImport").onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const rd=new FileReader();
+    rd.onload=()=>{
+      try{
+        const lines=rd.result.split(/\r?\n/).filter(Boolean);
+        const out=[];
+        for(let i=1;i<lines.length;i++){
+          const p=lines[i].split(","); const t=+p[1], type=(p[2]||"").trim();
+          if(t&&(type==="green"||type==="arrive")) out.push({t,type});
+        }
+        if(out.length){ state.events=out.sort((a,b)=>a.t-b.t); save(); render(); }
+      }catch(err){ alert("Couldn't read that CSV."); }
+    };
+    rd.readAsText(f); e.target.value="";
+  };
+  $("btnClear").onclick=()=>{ if(confirm("Delete all logged events?")){ state.events=[]; save(); render(); } };
+
+  render();
+  setInterval(render,1000);     // live countdown + sweeping hand
+})();
+</script>
+</body>
+</html>
